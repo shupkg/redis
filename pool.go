@@ -37,11 +37,11 @@ var nowFunc = time.Now // for testing
 // ErrPoolExhausted is returned from a pool connection method (Do, Send,
 // Receive, Flush, Err) when the maximum number of database connections in the
 // pool has been reached.
-var ErrPoolExhausted = errors.New("redigo: connection pool exhausted")
+var ErrPoolExhausted = errors.New("redis: connection pool exhausted")
 
 var (
-	errPoolClosed = errors.New("redigo: connection pool closed")
-	errConnClosed = errors.New("redigo: connection closed")
+	errPoolClosed = errors.New("redis: connection pool closed")
+	errConnClosed = errors.New("redis: connection closed")
 )
 
 // Pool maintains a pool of connections. The application calls the Get method
@@ -172,13 +172,6 @@ type Pool struct {
 	waitDuration time.Duration // total time waited for new connections.
 }
 
-// NewPool creates a new pool.
-//
-// Deprecated: Initialize the Pool directly as shown in the example.
-func NewPool(newFn func() (Conn, error), maxIdle int) *Pool {
-	return &Pool{Dial: newFn, MaxIdle: maxIdle}
-}
-
 // Get gets a connection. The application must close the returned connection.
 // This method always returns a valid connection so that applications can defer
 // error handling to the first use of the connection. If there is an error
@@ -242,7 +235,7 @@ func (p *Pool) GetContext(ctx context.Context) (Conn, error) {
 	// Check for pool closed before dialing a new connection.
 	if p.closed {
 		p.mu.Unlock()
-		err := errors.New("redigo: get on closed pool")
+		err := errors.New("redis: get on closed pool")
 		return errorConn{err}, err
 	}
 
@@ -407,7 +400,7 @@ func (p *Pool) dial(ctx context.Context) (Conn, error) {
 	if p.Dial != nil {
 		return p.Dial()
 	}
-	return nil, errors.New("redigo: must pass Dial or DialContext to pool")
+	return nil, errors.New("redis: must pass Dial or DialContext to pool")
 }
 
 func (p *Pool) put(pc *poolConn, forceClose bool) error {
@@ -469,7 +462,7 @@ func (ac *activeConn) Close() error {
 
 	if ac.state&connectionMultiState != 0 {
 		pc.c.Send("DISCARD")
-		ac.state &^= (connectionMultiState | connectionWatchState)
+		ac.state &^= connectionMultiState | connectionWatchState
 	} else if ac.state&connectionWatchState != 0 {
 		pc.c.Send("UNWATCH")
 		ac.state &^= connectionWatchState

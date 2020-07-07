@@ -226,7 +226,7 @@ func DialContext(ctx context.Context, network, address string, options ...DialOp
 		if do.tlsConfig == nil {
 			tlsConfig = &tls.Config{InsecureSkipVerify: do.skipVerify}
 		} else {
-			tlsConfig = cloneTLSConfig(do.tlsConfig)
+			tlsConfig = do.tlsConfig.Clone()
 		}
 		if tlsConfig.ServerName == "" {
 			host, _, err := net.SplitHostPort(address)
@@ -342,7 +342,7 @@ func DialURL(rawurl string, options ...DialOption) (Conn, error) {
 	return Dial("tcp", address, options...)
 }
 
-// NewConn returns a new Redigo connection for the given net connection.
+// NewConn returns a new redis connection for the given net connection.
 func NewConn(netConn net.Conn, readTimeout, writeTimeout time.Duration) Conn {
 	return &conn{
 		conn:         netConn,
@@ -357,7 +357,7 @@ func (c *conn) Close() error {
 	c.mu.Lock()
 	err := c.err
 	if c.err == nil {
-		c.err = errors.New("redigo: closed")
+		c.err = errors.New("redis: closed")
 		err = c.conn.Close()
 	}
 	c.mu.Unlock()
@@ -476,7 +476,7 @@ func (c *conn) writeArg(arg interface{}, argumentTypeOK bool) (err error) {
 type protocolError string
 
 func (pe protocolError) Error() string {
-	return fmt.Sprintf("redigo: %s (possible server error or unsupported concurrent read by application)", string(pe))
+	return fmt.Sprintf("redis: %s (possible server error or unsupported concurrent read by application)", string(pe))
 }
 
 // readLine reads a line of input from the RESP stream.

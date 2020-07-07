@@ -327,13 +327,13 @@ func convertAssign(d interface{}, s interface{}) (err error) {
 // following the copied values.
 func Scan(src []interface{}, dest ...interface{}) ([]interface{}, error) {
 	if len(src) < len(dest) {
-		return nil, errors.New("redigo.Scan: array short")
+		return nil, errors.New("redis.Scan: array short")
 	}
 	var err error
 	for i, d := range dest {
 		err = convertAssign(d, src[i])
 		if err != nil {
-			err = fmt.Errorf("redigo.Scan: cannot assign to dest %d: %v", i, err)
+			err = fmt.Errorf("redis.Scan: cannot assign to dest %d: %v", i, err)
 			break
 		}
 	}
@@ -387,7 +387,7 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 					case "omitempty":
 						fs.omitEmpty = true
 					default:
-						panic(fmt.Errorf("redigo: unknown field tag %s for type %s", s, t.Name()))
+						panic(fmt.Errorf("redis: unknown field tag %s for type %s", s, t.Name()))
 					}
 				}
 			}
@@ -447,7 +447,7 @@ func structSpecForType(t reflect.Type) *structSpec {
 	return ss
 }
 
-var errScanStructValue = errors.New("redigo.ScanStruct: value must be non-nil pointer to a struct")
+var errScanStructValue = errors.New("redis.ScanStruct: value must be non-nil pointer to a struct")
 
 // ScanStruct scans alternating names and values from src to a struct. The
 // HGETALL and CONFIG GET commands return replies in this format.
@@ -477,7 +477,7 @@ func ScanStruct(src []interface{}, dest interface{}) error {
 	ss := structSpecForType(d.Type())
 
 	if len(src)%2 != 0 {
-		return errors.New("redigo.ScanStruct: number of values not a multiple of 2")
+		return errors.New("redis.ScanStruct: number of values not a multiple of 2")
 	}
 
 	for i := 0; i < len(src); i += 2 {
@@ -487,21 +487,21 @@ func ScanStruct(src []interface{}, dest interface{}) error {
 		}
 		name, ok := src[i].([]byte)
 		if !ok {
-			return fmt.Errorf("redigo.ScanStruct: key %d not a bulk string value", i)
+			return fmt.Errorf("redis.ScanStruct: key %d not a bulk string value", i)
 		}
 		fs := ss.fieldSpec(name)
 		if fs == nil {
 			continue
 		}
 		if err := convertAssignValue(d.FieldByIndex(fs.index), s); err != nil {
-			return fmt.Errorf("redigo.ScanStruct: cannot assign field %s: %v", fs.name, err)
+			return fmt.Errorf("redis.ScanStruct: cannot assign field %s: %v", fs.name, err)
 		}
 	}
 	return nil
 }
 
 var (
-	errScanSliceValue = errors.New("redigo.ScanSlice: dest must be non-nil pointer to a struct")
+	errScanSliceValue = errors.New("redis.ScanSlice: dest must be non-nil pointer to a struct")
 )
 
 // ScanSlice scans src to the slice pointed to by dest.
@@ -539,7 +539,7 @@ func ScanSlice(src []interface{}, dest interface{}, fieldNames ...string) error 
 				continue
 			}
 			if err := convertAssignValue(d.Index(i), s); err != nil {
-				return fmt.Errorf("redigo.ScanSlice: cannot assign element %d: %v", i, err)
+				return fmt.Errorf("redis.ScanSlice: cannot assign element %d: %v", i, err)
 			}
 		}
 		return nil
@@ -552,18 +552,18 @@ func ScanSlice(src []interface{}, dest interface{}, fieldNames ...string) error 
 		for i, name := range fieldNames {
 			fss[i] = ss.m[name]
 			if fss[i] == nil {
-				return fmt.Errorf("redigo.ScanSlice: ScanSlice bad field name %s", name)
+				return fmt.Errorf("redis.ScanSlice: ScanSlice bad field name %s", name)
 			}
 		}
 	}
 
 	if len(fss) == 0 {
-		return errors.New("redigo.ScanSlice: no struct fields")
+		return errors.New("redis.ScanSlice: no struct fields")
 	}
 
 	n := len(src) / len(fss)
 	if n*len(fss) != len(src) {
-		return errors.New("redigo.ScanSlice: length not a multiple of struct field count")
+		return errors.New("redis.ScanSlice: length not a multiple of struct field count")
 	}
 
 	ensureLen(d, n)
@@ -581,7 +581,7 @@ func ScanSlice(src []interface{}, dest interface{}, fieldNames ...string) error 
 				continue
 			}
 			if err := convertAssignValue(d.FieldByIndex(fs.index), s); err != nil {
-				return fmt.Errorf("redigo.ScanSlice: cannot assign element %d to field %s: %v", i*len(fss)+j, fs.name, err)
+				return fmt.Errorf("redis.ScanSlice: cannot assign element %d to field %s: %v", i*len(fss)+j, fs.name, err)
 			}
 		}
 	}

@@ -22,7 +22,7 @@ import (
 )
 
 // ErrNil indicates that a reply value is nil.
-var ErrNil = errors.New("redigo: nil returned")
+var ErrNil = errors.New("redis: nil returned")
 
 // Int is a helper that converts a command reply to an integer. If err is not
 // equal to nil, then Int returns 0, err. Otherwise, Int converts the
@@ -52,7 +52,7 @@ func Int(reply interface{}, err error) (int, error) {
 	case Error:
 		return 0, reply
 	}
-	return 0, fmt.Errorf("redigo: unexpected type for Int, got type %T", reply)
+	return 0, fmt.Errorf("redis: unexpected type for Int, got type %T", reply)
 }
 
 // Int64 is a helper that converts a command reply to 64 bit integer. If err is
@@ -79,11 +79,11 @@ func Int64(reply interface{}, err error) (int64, error) {
 	case Error:
 		return 0, reply
 	}
-	return 0, fmt.Errorf("redigo: unexpected type for Int64, got type %T", reply)
+	return 0, fmt.Errorf("redis: unexpected type for Int64, got type %T", reply)
 }
 
 func errNegativeInt(v int64) error {
-	return fmt.Errorf("redigo: unexpected negative value %v for Uint64", v)
+	return fmt.Errorf("redis: unexpected negative value %v for Uint64", v)
 }
 
 // Uint64 is a helper that converts a command reply to 64 bit unsigned integer.
@@ -113,7 +113,7 @@ func Uint64(reply interface{}, err error) (uint64, error) {
 	case Error:
 		return 0, reply
 	}
-	return 0, fmt.Errorf("redigo: unexpected type for Uint64, got type %T", reply)
+	return 0, fmt.Errorf("redis: unexpected type for Uint64, got type %T", reply)
 }
 
 // Float64 is a helper that converts a command reply to 64 bit float. If err is
@@ -137,7 +137,7 @@ func Float64(reply interface{}, err error) (float64, error) {
 	case Error:
 		return 0, reply
 	}
-	return 0, fmt.Errorf("redigo: unexpected type for Float64, got type %T", reply)
+	return 0, fmt.Errorf("redis: unexpected type for Float64, got type %T", reply)
 }
 
 // String is a helper that converts a command reply to a string. If err is not
@@ -163,7 +163,7 @@ func String(reply interface{}, err error) (string, error) {
 	case Error:
 		return "", reply
 	}
-	return "", fmt.Errorf("redigo: unexpected type for String, got type %T", reply)
+	return "", fmt.Errorf("redis: unexpected type for String, got type %T", reply)
 }
 
 // Bytes is a helper that converts a command reply to a slice of bytes. If err
@@ -189,7 +189,7 @@ func Bytes(reply interface{}, err error) ([]byte, error) {
 	case Error:
 		return nil, reply
 	}
-	return nil, fmt.Errorf("redigo: unexpected type for Bytes, got type %T", reply)
+	return nil, fmt.Errorf("redis: unexpected type for Bytes, got type %T", reply)
 }
 
 // Bool is a helper that converts a command reply to a boolean. If err is not
@@ -215,7 +215,7 @@ func Bool(reply interface{}, err error) (bool, error) {
 	case Error:
 		return false, reply
 	}
-	return false, fmt.Errorf("redigo: unexpected type for Bool, got type %T", reply)
+	return false, fmt.Errorf("redis: unexpected type for Bool, got type %T", reply)
 }
 
 // MultiBulk is a helper that converts an array command reply to a []interface{}.
@@ -243,7 +243,7 @@ func Values(reply interface{}, err error) ([]interface{}, error) {
 	case Error:
 		return nil, reply
 	}
-	return nil, fmt.Errorf("redigo: unexpected type for Values, got type %T", reply)
+	return nil, fmt.Errorf("redis: unexpected type for Values, got type %T", reply)
 }
 
 func sliceHelper(reply interface{}, err error, name string, makeSlice func(int), assign func(int, interface{}) error) error {
@@ -267,7 +267,7 @@ func sliceHelper(reply interface{}, err error, name string, makeSlice func(int),
 	case Error:
 		return reply
 	}
-	return fmt.Errorf("redigo: unexpected type for %s, got type %T", name, reply)
+	return fmt.Errorf("redis: unexpected type for %s, got type %T", name, reply)
 }
 
 // Float64s is a helper that converts an array command reply to a []float64. If
@@ -279,7 +279,7 @@ func Float64s(reply interface{}, err error) ([]float64, error) {
 	err = sliceHelper(reply, err, "Float64s", func(n int) { result = make([]float64, n) }, func(i int, v interface{}) error {
 		p, ok := v.([]byte)
 		if !ok {
-			return fmt.Errorf("redigo: unexpected element type for Floats64, got type %T", v)
+			return fmt.Errorf("redis: unexpected element type for Floats64, got type %T", v)
 		}
 		f, err := strconv.ParseFloat(string(p), 64)
 		result[i] = f
@@ -303,7 +303,7 @@ func Strings(reply interface{}, err error) ([]string, error) {
 			result[i] = string(v)
 			return nil
 		default:
-			return fmt.Errorf("redigo: unexpected element type for Strings, got type %T", v)
+			return fmt.Errorf("redis: unexpected element type for Strings, got type %T", v)
 		}
 	})
 	return result, err
@@ -318,7 +318,7 @@ func ByteSlices(reply interface{}, err error) ([][]byte, error) {
 	err = sliceHelper(reply, err, "ByteSlices", func(n int) { result = make([][]byte, n) }, func(i int, v interface{}) error {
 		p, ok := v.([]byte)
 		if !ok {
-			return fmt.Errorf("redigo: unexpected element type for ByteSlices, got type %T", v)
+			return fmt.Errorf("redis: unexpected element type for ByteSlices, got type %T", v)
 		}
 		result[i] = p
 		return nil
@@ -342,7 +342,7 @@ func Int64s(reply interface{}, err error) ([]int64, error) {
 			result[i] = n
 			return err
 		default:
-			return fmt.Errorf("redigo: unexpected element type for Int64s, got type %T", v)
+			return fmt.Errorf("redis: unexpected element type for Int64s, got type %T", v)
 		}
 	})
 	return result, err
@@ -368,7 +368,7 @@ func Ints(reply interface{}, err error) ([]int, error) {
 			result[i] = n
 			return err
 		default:
-			return fmt.Errorf("redigo: unexpected element type for Ints, got type %T", v)
+			return fmt.Errorf("redis: unexpected element type for Ints, got type %T", v)
 		}
 	})
 	return result, err
@@ -383,14 +383,14 @@ func StringMap(result interface{}, err error) (map[string]string, error) {
 		return nil, err
 	}
 	if len(values)%2 != 0 {
-		return nil, errors.New("redigo: StringMap expects even number of values result")
+		return nil, errors.New("redis: StringMap expects even number of values result")
 	}
 	m := make(map[string]string, len(values)/2)
 	for i := 0; i < len(values); i += 2 {
 		key, okKey := values[i].([]byte)
 		value, okValue := values[i+1].([]byte)
 		if !okKey || !okValue {
-			return nil, errors.New("redigo: StringMap key not a bulk string value")
+			return nil, errors.New("redis: StringMap key not a bulk string value")
 		}
 		m[string(key)] = string(value)
 	}
@@ -406,13 +406,13 @@ func IntMap(result interface{}, err error) (map[string]int, error) {
 		return nil, err
 	}
 	if len(values)%2 != 0 {
-		return nil, errors.New("redigo: IntMap expects even number of values result")
+		return nil, errors.New("redis: IntMap expects even number of values result")
 	}
 	m := make(map[string]int, len(values)/2)
 	for i := 0; i < len(values); i += 2 {
 		key, ok := values[i].([]byte)
 		if !ok {
-			return nil, errors.New("redigo: IntMap key not a bulk string value")
+			return nil, errors.New("redis: IntMap key not a bulk string value")
 		}
 		value, err := Int(values[i+1], nil)
 		if err != nil {
@@ -432,13 +432,13 @@ func Int64Map(result interface{}, err error) (map[string]int64, error) {
 		return nil, err
 	}
 	if len(values)%2 != 0 {
-		return nil, errors.New("redigo: Int64Map expects even number of values result")
+		return nil, errors.New("redis: Int64Map expects even number of values result")
 	}
 	m := make(map[string]int64, len(values)/2)
 	for i := 0; i < len(values); i += 2 {
 		key, ok := values[i].([]byte)
 		if !ok {
-			return nil, errors.New("redigo: Int64Map key not a bulk string value")
+			return nil, errors.New("redis: Int64Map key not a bulk string value")
 		}
 		value, err := Int64(values[i+1], nil)
 		if err != nil {
@@ -463,10 +463,10 @@ func Positions(result interface{}, err error) ([]*[2]float64, error) {
 		}
 		p, ok := values[i].([]interface{})
 		if !ok {
-			return nil, fmt.Errorf("redigo: unexpected element type for interface slice, got type %T", values[i])
+			return nil, fmt.Errorf("redis: unexpected element type for interface slice, got type %T", values[i])
 		}
 		if len(p) != 2 {
-			return nil, fmt.Errorf("redigo: unexpected number of values for a member position, got %d", len(p))
+			return nil, fmt.Errorf("redis: unexpected number of values for a member position, got %d", len(p))
 		}
 		lat, err := Float64(p[0], nil)
 		if err != nil {
@@ -497,7 +497,7 @@ func Uint64s(reply interface{}, err error) ([]uint64, error) {
 			result[i] = n
 			return err
 		default:
-			return fmt.Errorf("redigo: unexpected element type for Uint64s, got type %T", v)
+			return fmt.Errorf("redis: unexpected element type for Uint64s, got type %T", v)
 		}
 	})
 	return result, err
@@ -512,13 +512,13 @@ func Uint64Map(result interface{}, err error) (map[string]uint64, error) {
 		return nil, err
 	}
 	if len(values)%2 != 0 {
-		return nil, errors.New("redigo: Uint64Map expects even number of values result")
+		return nil, errors.New("redis: Uint64Map expects even number of values result")
 	}
 	m := make(map[string]uint64, len(values)/2)
 	for i := 0; i < len(values); i += 2 {
 		key, ok := values[i].([]byte)
 		if !ok {
-			return nil, errors.New("redigo: Uint64Map key not a bulk string value")
+			return nil, errors.New("redis: Uint64Map key not a bulk string value")
 		}
 		value, err := Uint64(values[i+1], nil)
 		if err != nil {
@@ -540,41 +540,41 @@ func SlowLogs(result interface{}, err error) ([]SlowLog, error) {
 	for i, rawLog := range rawLogs {
 		rawLog, ok := rawLog.([]interface{})
 		if !ok {
-			return nil, errors.New("redigo: slowlog element is not an array")
+			return nil, errors.New("redis: slowlog element is not an array")
 		}
 
 		var log SlowLog
 
 		if len(rawLog) < 4 {
-			return nil, errors.New("redigo: slowlog element has less than four elements")
+			return nil, errors.New("redis: slowlog element has less than four elements")
 		}
 		log.ID, ok = rawLog[0].(int64)
 		if !ok {
-			return nil, errors.New("redigo: slowlog element[0] not an int64")
+			return nil, errors.New("redis: slowlog element[0] not an int64")
 		}
 		timestamp, ok := rawLog[1].(int64)
 		if !ok {
-			return nil, errors.New("redigo: slowlog element[1] not an int64")
+			return nil, errors.New("redis: slowlog element[1] not an int64")
 		}
 		log.Time = time.Unix(timestamp, 0)
 		duration, ok := rawLog[2].(int64)
 		if !ok {
-			return nil, errors.New("redigo: slowlog element[2] not an int64")
+			return nil, errors.New("redis: slowlog element[2] not an int64")
 		}
 		log.ExecutionTime = time.Duration(duration) * time.Microsecond
 
 		log.Args, err = Strings(rawLog[3], nil)
 		if err != nil {
-			return nil, fmt.Errorf("redigo: slowlog element[3] is not array of string. actual error is : %s", err.Error())
+			return nil, fmt.Errorf("redis: slowlog element[3] is not array of string. actual error is : %s", err.Error())
 		}
 		if len(rawLog) >= 6 {
 			log.ClientAddr, err = String(rawLog[4], nil)
 			if err != nil {
-				return nil, fmt.Errorf("redigo: slowlog element[4] is not a string. actual error is : %s", err.Error())
+				return nil, fmt.Errorf("redis: slowlog element[4] is not a string. actual error is : %s", err.Error())
 			}
 			log.ClientName, err = String(rawLog[5], nil)
 			if err != nil {
-				return nil, fmt.Errorf("redigo: slowlog element[5] is not a string. actual error is : %s", err.Error())
+				return nil, fmt.Errorf("redis: slowlog element[5] is not a string. actual error is : %s", err.Error())
 			}
 		}
 		logs[i] = log

@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
+	"github.com/shupkg/redis"
 )
 
 var (
@@ -116,12 +116,12 @@ var replyTests = []struct {
 	{
 		"float64(1.0)",
 		ve(redis.Float64([]byte("1.0"), nil)),
-		ve(float64(1.0), nil),
+		ve(1.0, nil),
 	},
 	{
 		"float64(nil)",
 		ve(redis.Float64(nil, nil)),
-		ve(float64(0.0), redis.ErrNil),
+		ve(0.0, redis.ErrNil),
 	},
 	{
 		"uint64(1)",

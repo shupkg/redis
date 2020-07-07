@@ -144,5 +144,5 @@ func (c PubSubConn) receiveInternal(replyArg interface{}, errArg error) interfac
 		}
 		return p
 	}
-	return errors.New("redigo: unknown pubsub notification")
+	return errors.New("redis: unknown pubsub notification")
 }
